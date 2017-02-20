@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+	<style type="text/css">
+		#box{ width: 100px; height: 100px; background: red;
+		position: absolute;left: 200px; top: 100px;}
+	</style>
+	<script type="text/javascript">
+		/*
+		 *  抖动 函数：  
+		 *   谁抖    怎么抖     抖的幅度  抖的频率  回调
+		 * 
+		 * */
+		function getStyle(obj,attr){
+			return obj.currentStyle ? obj.currentStyle[attr]:getComputedStyle(obj)[attr];
+		};
+		
+		function shake(obj,attr,fudu,rate,fn){  
+			if(obj.timer) return ;
+			var arr=[];
+			obj.timer=null;
+			for(var i=fudu;i>0;i-=rate){
+				arr.push(i,-i);
+			};
+			arr.push(0);
+			var num=0;
+			obj.timer=setInterval(function(){
+				obj.style[attr]=parseInt( getStyle(obj,attr) )+arr[num]+"px";
+				num++;
+				if(num==arr.length){
+					clearInterval(obj.timer);
+					obj.timer=null;
+					fn&&fn.call(obj);
+				}
+			},30);   
+			
+		};
+		//[10 -10 9 -9]  10  6   2   0
+		
+		window.onload=function(){
+			var oBox=document.getElementById("box");
+			oBox.onmouseover=function(){
+				shake(this,"top",50,1,function(){  //14ms
+					shake(this,"left",30,2)
+				});
+				/*//10-987654321---0
+				//arr.push(10)arr.push(9) arr.push(8)
+				//如果当前正在抖，则return 出去 阻止开启新的抖
+				if(oBox.timer) return ;
+				var arr=[];//建立一个数组  用于存储 抖动的数据
+				oBox.timer=null;
+				for(var i=20;i>0;i--){
+					arr.push(i,-i);
+				};
+				arr.push(0);
+				//console.log(arr);拿到正确的抖动数据
+				//获取运动对象的当初的位置 并且转成数字
+				var iCur=parseInt( getStyle(oBox,"left"));
+				var num=0;
+				//为了便于管理和清除定时器 ，将定时器挂载到运动物体的自定义属性身上
+				oBox.timer=setInterval(function(){
+					oBox.style.left=iCur+arr[num]+"px";
+					num++;
+					//console.log(num);
+					if(num==arr.length){
+						clearInterval(oBox.timer);
+						oBox.timer=null;
+					};
+				},30);
+				//oBox.style.left=//200+10    200-10   200+5   200-5  200*/
+				
+			};
+		};
+		
+	</script>
+</head>
+<body>
+	<div id="box"></div>
+</body>
+</html>
